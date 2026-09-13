@@ -11,6 +11,8 @@ A modern, offline-first Android application built with **Jetpack Compose**, **Da
 - ❤️ **Favorites Persistence**: Save or remove favorite quotes with offline persistence in Room DB.
 - ➕ **Add Custom Quotes**: Create and manage your own custom quotes saved locally.
 - 🎨 **Theme Mode Switcher (Light / Dark / System Default)**: Persistent theme selection using Jetpack DataStore Preferences.
+- 🌐 **Real-time Network & Offline Status Banner**: Live network state observer powered by `ConnectivityManager.NetworkCallback` displaying custom Offline/Back-Online status snackbars anchored right above the bottom navigation bar.
+- 🔒 **SSL Certificate Pinning**: Enforces SSL/TLS Certificate Pinning using OkHttp `CertificatePinner` configured via `gradle.properties` and AGP `BuildConfig` fields to protect network calls against Man-In-The-Middle (MITM) attacks.
 - 🔔 **Interactive Periodic Notifications**: Scheduled background quote notifications powered by WorkManager with custom expanded/collapsed `RemoteViews` layouts and direct "Share" & "Copy" notification drawer actions.
 - ♿ **Accessibility First (WCAG Compliant)**: Full TalkBack screen reader support (`semantics`, `heading`, `stateDescription`, `liveRegion`), minimum 48dp touch targets, and IME keyboard focus flow.
 
@@ -31,7 +33,7 @@ The app follows **Clean Architecture** and **MVVM (Model-View-ViewModel)** desig
 | **Jetpack Compose** | Modern declarative UI toolkit |
 | **Dagger Hilt** | Dependency injection framework |
 | **Room DB** | SQLite local database with Coroutines Flow |
-| **Retrofit 2 & OkHttp** | REST API networking with Gson serialization |
+| **Retrofit 2 & OkHttp** | REST API networking with Gson serialization & SSL Certificate Pinning |
 | **Jetpack DataStore** | Asynchronous key-value preference storage |
 | **WorkManager & HiltWorker** | Background scheduled notifications |
 | **Coil Compose** | Image loading library |
@@ -55,7 +57,7 @@ com.example.quotes/
 │   │   └── model/QuoteResponseDto.kt    # Remote DTO Data Models
 ├── di/
 │   ├── DatabaseModule.kt                # Hilt Room DI Module
-│   └── NetworkModule.kt                 # Hilt Retrofit/OkHttp DI Module
+│   └── NetworkModule.kt                 # Hilt Retrofit/OkHttp DI Module (with SSL Pinning)
 ├── domain/
 │   ├── model/                           # Domain Models (Quote, QuoteCategory)
 │   ├── repository/QuoteRepository.kt    # Core Repository Implementation
@@ -69,9 +71,11 @@ com.example.quotes/
 │   ├── quotes/                          # Main Quotes Stream Screen & ViewModel
 │   └── theme/                           # App Themes & Theme ViewModel
 ├── util/
+│   ├── NetworkConnectivityObserver.kt   # Real-time Network Observer (ConnectivityManager)
+│   ├── NetworkUtil.kt                   # Image Loading & Network Utilities
 │   ├── NotificationActionReceiver.kt    # BroadcastReceiver for Notification Actions
 │   ├── NotificationHelper.kt            # Custom Notification Builder
-│   └── NetworkUtil.kt                   # Connectivity Utilities
+│   └── Shapes.kt                        # Custom UI Component Shapes
 └── worker/
     ├── QuoteNotificationWorker.kt       # Hilt WorkManager CoroutineWorker
     └── QuoteNotificationScheduler.kt    # Periodic Work Request Manager
