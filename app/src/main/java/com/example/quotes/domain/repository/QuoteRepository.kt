@@ -7,9 +7,12 @@ import com.example.quotes.data.remote.api.QuotesApiService
 import com.example.quotes.domain.model.Quote
 import com.example.quotes.domain.model.QuoteCategory
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import java.io.IOException
+import java.net.SocketTimeoutException
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -69,17 +72,44 @@ class QuoteRepository @Inject constructor(
     ): Result<Unit> {
         return withContext(Dispatchers.IO) {
             try {
-                val response = quotesApiService.getQuotes(limit = limit, skip = skip)
+                val response = retryOnTimeout(times = 3) {
+                    quotesApiService.getQuotes(limit = limit, skip = skip)
+                }
                 val entities = response.quotes.map { it.toEntity() }
                 if (entities.isNotEmpty()) {
                     quoteDao.insertQuotes(entities)
                 }
                 Result.success(Unit)
-            } catch (e: Exception) {
+            }catch (e: SocketTimeoutException) {
+                // Handle timeout specifically (e.g., log, trigger retry, or pass custom domain exception)
+                Result.failure(Exception("Request timed out. Please check your internet connection and try again."))
+            } catch (e: IOException) {
+                // Handle general network failures (e.g., no internet / UnknownHostException)
+                Result.failure(Exception("Network error occurred."))
+            }  catch (e: Exception) {
                 // Network failure: return failure result while local Room DB serves cached quotes
                 Result.failure(e)
             }
         }
+    }
+
+    suspend fun <T> retryOnTimeout(
+        times: Int = 3,
+        initialDelayMs: Long = 1000,
+        factor: Double = 2.0,
+        block: suspend () -> T
+    ): T {
+        var currentDelay = initialDelayMs
+        repeat(times - 1) {
+            try {
+                return block()
+            } catch (e: SocketTimeoutException) {
+                // Log retry attempt if needed
+            }
+            delay(currentDelay)
+            currentDelay = (currentDelay * factor).toLong()
+        }
+        return block() // Last attempt
     }
 
     suspend fun toggleFavorite(id: Long, isFavorite: Boolean) {
