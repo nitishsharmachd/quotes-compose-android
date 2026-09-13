@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <group
+        android:translateX="18"
+        android:translateY="18">
+        <!-- Circular Accent Backdrop -->
+        <path
+            android:fillColor="#FF6D00"
+            android:pathData="M36,4A32,32 0,1 1,4,36A32,32 0,0 1,36,4Z" />
+        <path
+            android:fillColor="#7A33E0"
+            android:pathData="M36,8A28,28 0,1 1,8,36A28,28 0,0 1,36,8Z" />
+        <!-- Left Quotation Mark -->
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M23,26 C19.13,26 16,29.13 16,33 C16,36.87 19.13,40 23,40 C26.87,40 30,36.87 30,33 C30,25.26 23.74,19 16,19 L16,23 C20.42,23 24,26.58 24,31 C23.68,30.98 23.34,30.96 23,30.96 Z" />
+        <!-- Right Quotation Mark -->
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M43,26 C39.13,26 36,29.13 36,33 C36,36.87 39.13,40 43,40 C46.87,40 50,36.87 50,33 C50,25.26 43.74,19 36,19 L36,23 C40.42,23 44,26.58 44,31 C43.68,30.98 43.34,30.96 43,30.96 Z" />
+        <!-- Sparkle Accent -->
+        <path
+            android:fillColor="#FFB300"
+            android:pathData="M52,14 L53.5,19.5 L59,21 L53.5,22.5 L52,28 L50.5,22.5 L45,21 L50.5,19.5 Z" />
+    </group>
+</vector>
