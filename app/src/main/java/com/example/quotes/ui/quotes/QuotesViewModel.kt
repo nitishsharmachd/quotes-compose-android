@@ -53,6 +53,7 @@ class QuotesViewModel @Inject constructor(
 
     private val _isRefreshing = MutableStateFlow(false)
     private val _isLoadingMore = MutableStateFlow(false)
+    private val _errorMessage = MutableStateFlow<String?>(null)
 
     private var currentSkip = 0
     private val pageSize = QuotesApiService.DEFAULT_LIMIT
@@ -70,25 +71,34 @@ class QuotesViewModel @Inject constructor(
         }
     }
 
+    private data class FilterState(
+        val category: QuoteCategory,
+        val query: String,
+        val loadingMore: Boolean,
+        val error: String?,
+    )
+
     val uiState: StateFlow<QuotesUiState> = combine(
         _selectedCategory,
         _searchQuery,
         _isLoadingMore,
-    ) { category, query, loadingMore ->
-        Triple(category, query, loadingMore)
-    }.flatMapLatest { (category, query, loadingMore) ->
-        val flow = if (query.isNotBlank()) {
-            searchQuotesUseCase(query)
+        _errorMessage,
+    ) { category, query, loadingMore, error ->
+        FilterState(category, query, loadingMore, error)
+    }.flatMapLatest { filterState ->
+        val flow = if (filterState.query.isNotBlank()) {
+            searchQuotesUseCase(filterState.query)
         } else {
-            getQuotesUseCase(category)
+            getQuotesUseCase(filterState.category)
         }
         flow.map { quotesList ->
             QuotesUiState(
                 quotes = quotesList,
-                selectedCategory = category,
-                searchQuery = query,
+                selectedCategory = filterState.category,
+                searchQuery = filterState.query,
                 isLoading = false,
-                isLoadingMore = loadingMore,
+                isLoadingMore = filterState.loadingMore,
+                errorMessage = filterState.error,
             )
         }
     }.stateIn(
@@ -106,6 +116,9 @@ class QuotesViewModel @Inject constructor(
             result.onSuccess {
                 currentSkip = pageSize
             }
+            result.onFailure { exception ->
+                _errorMessage.value = exception.message ?: "Failed to load quotes"
+            }
             _isRefreshing.value = false
         }
     }
@@ -118,11 +131,16 @@ class QuotesViewModel @Inject constructor(
             result.onSuccess {
                 currentSkip += pageSize
             }
-            result.onFailure {
+            result.onFailure { exception ->
                 isEndReached = true
+                _errorMessage.value = exception.message ?: "Failed to load more quotes"
             }
             _isLoadingMore.value = false
         }
+    }
+
+    fun onErrorMessageShown() {
+        _errorMessage.value = null
     }
 
     fun onCategorySelected(category: QuoteCategory) {

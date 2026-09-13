@@ -46,6 +46,8 @@ import com.example.quotes.ui.components.QuoteCard
 import com.example.quotes.ui.components.ThemeOptionsMenu
 import com.example.quotes.ui.theme.ThemeMode
 
+import androidx.compose.material.rememberScaffoldState
+
 @Composable
 fun QuotesScreen(
     viewModel: QuotesViewModel,
@@ -55,12 +57,20 @@ fun QuotesScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
+    val scaffoldState = rememberScaffoldState()
 
     var searchQueryText by remember { mutableStateOf(uiState.searchQuery) }
 
     LaunchedEffect(uiState.searchQuery) {
         if (searchQueryText != uiState.searchQuery) {
             searchQueryText = uiState.searchQuery
+        }
+    }
+
+    LaunchedEffect(uiState.errorMessage) {
+        uiState.errorMessage?.let { message ->
+            scaffoldState.snackbarHostState.showSnackbar(message)
+            viewModel.onErrorMessageShown()
         }
     }
 
@@ -79,6 +89,7 @@ fun QuotesScreen(
     }
 
     Scaffold(
+        scaffoldState = scaffoldState,
         topBar = {
             TopAppBar(
                 title = {
