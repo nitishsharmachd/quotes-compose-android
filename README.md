@@ -11,6 +11,7 @@ A modern, offline-first Android application built with **Jetpack Compose**, **Da
 - ❤️ **Favorites Persistence**: Save or remove favorite quotes with offline persistence in Room DB.
 - ➕ **Add Custom Quotes**: Create and manage your own custom quotes saved locally.
 - 🎨 **Theme Mode Switcher (Light / Dark / System Default)**: Persistent theme selection using Jetpack DataStore Preferences.
+- 🔋 **Battery Optimization & Doze Mode Handling**: Integrated `PowerManager` battery optimization controls and WorkManager constraints (`setRequiresBatteryNotLow`) to ensure background quote notifications arrive on schedule.
 - 🌐 **Real-time Network & Offline Status Banner**: Live network state observer powered by `ConnectivityManager.NetworkCallback` displaying custom Offline/Back-Online status snackbars anchored right above the bottom navigation bar.
 - 🔒 **SSL Certificate Pinning**: Enforces SSL/TLS Certificate Pinning using OkHttp `CertificatePinner` configured via `gradle.properties` and AGP `BuildConfig` fields to protect network calls against Man-In-The-Middle (MITM) attacks.
 - 🔔 **Interactive Periodic Notifications**: Scheduled background quote notifications powered by WorkManager with custom expanded/collapsed `RemoteViews` layouts and direct "Share" & "Copy" notification drawer actions.
@@ -71,6 +72,7 @@ com.example.quotes/
 │   ├── quotes/                          # Main Quotes Stream Screen & ViewModel
 │   └── theme/                           # App Themes & Theme ViewModel
 ├── util/
+│   ├── BatteryOptimizationUtil.kt       # PowerManager Battery Saver & Doze Mode Utilities
 │   ├── NetworkConnectivityObserver.kt   # Real-time Network Observer (ConnectivityManager)
 │   ├── NetworkUtil.kt                   # Image Loading & Network Utilities
 │   ├── NotificationActionReceiver.kt    # BroadcastReceiver for Notification Actions
