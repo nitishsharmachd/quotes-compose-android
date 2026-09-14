@@ -31,10 +31,13 @@ android {
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
+            // Option to bypass or use staging pins in debug
+            buildConfigField("String", "SSL_PIN_PRIMARY", project.property("SSL_PIN_PRIMARY"))
         }
 
         release {
             minifyEnabled true
+            buildConfigField("String", "SSL_PIN_PRIMARY", project.property("SSL_PIN_PRIMARY"))
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
@@ -47,8 +50,7 @@ android {
     buildFeatures {
         compose true
 
-        // Disable unused AGP features
-        buildConfig false
+        buildConfig true
         aidl false
         renderScript false
         resValues false

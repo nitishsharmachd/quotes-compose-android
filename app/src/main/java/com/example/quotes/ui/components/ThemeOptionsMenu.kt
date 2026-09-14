@@ -1,5 +1,6 @@
 package com.example.quotes.ui.components
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.width
@@ -12,6 +13,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.RadioButton
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.BatteryAlert
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.runtime.Composable
@@ -24,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.example.quotes.ui.theme.ThemeMode
+import com.example.quotes.util.BatteryOptimizationUtil
 import com.example.quotes.util.NotificationHelper
 
 @Composable
@@ -68,6 +71,40 @@ fun ThemeOptionsMenu(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(text = mode.displayName)
+                }
+            }
+        }
+
+        Divider()
+
+        val isBatteryOptimized = remember(expanded) {
+            !BatteryOptimizationUtil.isIgnoringBatteryOptimizations(context)
+        }
+
+        DropdownMenuItem(
+            onClick = {
+                if (isBatteryOptimized) {
+                    BatteryOptimizationUtil.requestDisableBatteryOptimization(context)
+                } else {
+                    BatteryOptimizationUtil.openBatterySettings(context)
+                }
+                expanded = false
+            }
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = Icons.Default.BatteryAlert,
+                    contentDescription = null,
+                    tint = if (isBatteryOptimized) MaterialTheme.colors.primary else MaterialTheme.colors.secondary
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Column {
+                    Text(text = "Battery Optimization")
+                    Text(
+                        text = if (isBatteryOptimized) "Optimized (Click to allow fast notifications)" else "Unrestricted (Notifications on time)",
+                        style = MaterialTheme.typography.caption,
+                        color = MaterialTheme.colors.onSurface.copy(alpha = 0.6f)
+                    )
                 }
             }
         }
